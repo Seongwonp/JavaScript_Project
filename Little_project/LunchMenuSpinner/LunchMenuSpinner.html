@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>점심메뉴돌림판</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+</head>
+<body>
+  <div id="menuName">돌림판을 돌려주세요!</div>
+  <div id="menu">
+    <canvas width="600" height="600"></canvas>
+    <button onclick="rotate()">돌림판 돌리기</button>
+    <div id="addDiv">
+      <input type="text" id="menuAdd">
+      <button onclick="add()">메뉴 추가</button>
+    </div>
+  </div>
+  <script src="./js/script.js"></script>
+</body>
+</html>
