@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<script>
+        /*
+		  버튼을클릭하면 버튼에 있는 색상으로 과일 목록이 글자색이 변하도록
+		 */
+        document.addEventListener('DOMContentLoaded', () => {
+            const fruits = document.querySelectorAll('li');
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    fruits.forEach(fruit => fruit.style.color = button.textContent);
+                });
+            });
+
+        });
+	</script>
+</head>
+<body>
+<ul>
+	<li id="apple">Apple</li>
+	<li id="banana">Banana</li>
+	<li id="orange">Orange</li>
+</ul>
+<div>
+	<button>red</button>
+	<button>orange</button>
+	<button>yellow</button>
+</div>
+</body>
+</html>

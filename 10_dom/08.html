@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<script>
+		/*
+			문서 객체 이동하기
+			appendChild() 메소드를 사용하면 문서 객체를 이동할 수 있음.
+			문서 객체를 다른 문서 객체에 추가하면 문서 객체가 이동.
+		 */
+		document.addEventListener('DOMContentLoaded', () => {
+           const first = document.getElementById('first');
+           const second = document.getElementById('second');
+
+           const h1 = document.createElement('h1');
+           h1.textContent='이동하는 h1 태그';
+           const moveToFirst = ()=>{
+               first.appendChild(h1);
+               setTimeout(moveToSecond,2000);
+		   }
+           const moveToSecond = ()=>{
+               second.appendChild(h1);
+               setTimeout(moveToFirst,2000);
+           }
+
+           moveToFirst();
+
+
+
+
+
+        });
+	</script>
+</head>
+<body>
+	<div id="first">
+		<h1>첫 번째 div 태그 내부</h1>
+	</div>
+	<hr>
+	<div id="second">
+		<h1>두 번째 div 태그 내부</h1>
+	</div>
+</body>
+</html>

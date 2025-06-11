@@ -3,8 +3,36 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Title</title>
+	<script>
+		/*
+			스타일 조작하기
+			자바스크립트의 style 속성들의 이름이 CSS에서 사용할 때와 차이가 있음.
+			자바스크립트에서는 -가 연산자고, 식별자에 사용할 수 없어서 두 단어의 조압은 캐멀 케이스로 표현
+
+			background-color : backgroundColor
+			text-align : textAlign
+			font-size : fontSize
+
+			스타일 조정하는 방법.
+			h1.style.backgroundColor -> 이 형태를 가장 많이 사용.
+			h1.style['backgroundColor'] == h1.style['background-color']
+		 */
+		document.addEventListener('DOMContentLoaded', ()=>{
+            const divs = document.querySelectorAll('div');
+            divs.forEach((item,i) => {
+              	  item.style.height = '20px'; // 크기를 지정할 떄는 반드시 단위를 붙여줘야함!!
+				  item.style.backgroundColor = `rgb(0,${i * 10},0)`;
+
+            });
+        });
+	</script>
 </head>
 <body>
+	<div></div><div></div><div></div><div></div><div></div>
+	<div></div><div></div><div></div><div></div><div></div>
+	<div></div><div></div><div></div><div></div><div></div>
+	<div></div><div></div><div></div><div></div><div></div>
+	<div></div><div></div><div></div><div></div><div></div>
 
 </body>
 </html>

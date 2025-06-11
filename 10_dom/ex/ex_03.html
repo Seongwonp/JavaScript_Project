@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+  <script>
+
+    /*
+	li 요소 5개를 생성하고 itemList 안에 추가합니다.
+	각 li 요소의 텍스트는 "Item 1", "Item 2", …, "Item 5"로 설정합니다.
+	 */
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      for(let index = 1; index <=5; index++) {
+        const item = document.createElement('li');
+        item.textContent = `Item ${index}`;
+        document.getElementById('itemList').appendChild(item);
+      }
+    });
+  </script>
+</head>
+<body>
+  <ul id="itemList"></ul>
+</body>
+</html>

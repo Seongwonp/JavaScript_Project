@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+  <style>
+    *{margin: 0;padding: 0; list-style: none;}
+
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const button = document.querySelector('button');
+      const ul = document.querySelector('ul');
+      const color = ['red','orange','yellow','green','blue','indigo','violet'];
+      let  index = 0;
+      button.addEventListener('click', ()=>{
+        if(index < color.length){
+          const li = document.createElement('li');
+          li.style.backgroundColor = color[index % color.length];
+          li.textContent = color[index++ % color.length];
+          ul.appendChild(li);
+        } else{
+          ul.appendChild(document.querySelector('ul li'));
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+  <button>무지개색 추가</button>
+  <ul>
+
+  </ul>
+</body>
+</html>

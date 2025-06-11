@@ -1,10 +1,10 @@
 const $c = document.querySelector("canvas");
 const ctx = $c.getContext(`2d`);
 const product = [
-    "떡볶이",
+    "장뚝",
     "돈가스",
     "국밥",
-    "제육",
+    "토스트",
     "김밥짱",
     "중국집",
     "햄버거",
