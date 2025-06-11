@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+
+<div id="container">
+	<h1>수강신청</h1>
+	<form name="testForm">
+		<fieldset>
+			<legend>신청인</legend>
+			<ul>
+				<li>
+					<label class="reg" for="userName">이름</label>
+					<input type="text" id="userName" name="userName" maxlength="50">
+				</li>
+				<li>
+					<label class="reg" for="major">학과</label>
+					<select name="major" id="major">
+						<option>---- 학과 선택 ----</option>
+						<option value="architect">건축공학과</option>
+						<option value="mechanic">기계공학과</option>
+						<option value="industrial">산업공학과</option>
+						<option value="elect">전기전자공학과</option>
+						<option value="computer">컴퓨터공학과</option>
+						<option value="chemical">화학공학과</option>
+					</select>
+				</li>
+			</ul>
+		</fieldset>
+		<fieldset>
+			<legend>신청 과목</legend>
+			<p>이 달에 신청할 과목을 선택하세요.</p>
+			<label><input type="radio" name="subject" value="speaking">회화</label>
+			<label><input type="radio" name="subject" value="grammar">문법</label>
+			<label><input type="radio" name="subject" value="writing">작문</label>
+		</fieldset>
+		<fieldset>
+			<legend>메일링</legend>
+			<p>메일로 받고 싶은 뉴스 주제를 선택해 주세요</p>
+			<label><input type="checkbox" name="mailing1" value="news">해외 단신</label>
+			<label><input type="checkbox" name="mailing2" value="dialog">5분 회화</label>
+			<label><input type="checkbox" name="mailing3" value="pops">모닝팝스</label>
+		</fieldset>
+	</form>
+</div>
+<script>
+	/*
+		학과, 신청과목, 메일링에서 사용자가 선택을 하면 경고창으로 무엇을 선택했는지 알려줌
+		메일링 (체크박스)의 경우 체크 해제 된 경우도 알려줌.
+		예) 해외 단신(을)를 선택했습니다.
+		 해외 단신(을)를 선택해제했습니다.
+	 */
+	const userName = document.getElementById('userName'); // 이름
+    const major = document.getElementById('major'); // 전공
+    const subjects = document.querySelectorAll('input[name=subject]'); // 신청과목
+    const mailings = document.querySelectorAll('input[type=checkbox]'); // 메일링
+	let userNameInfo =''; // 이름 저장할 변수
+
+    userName.addEventListener('keyup', () => {
+		userNameInfo = userName.value; //이름 저장
+    });
+
+    // 학과
+    major.addEventListener('change', (e)=>{
+        //만약 이름을 작성한 경우
+        if(userNameInfo.length > 0){
+            alert(`${userNameInfo}님 환영합니다!`);
+        }
+        let index = e.target.selectedIndex; // 학과 인덱스 저장
+       alert(`${e.target.options[index].textContent}(을)를 선택했습니다.`);
+    });
+
+    // 신청 과목
+    subjects.forEach((subject)=>{
+        subject.addEventListener('change', ()=>{ //radio 가 label 로 묶여있기 때문에 부모요소를 가져욤
+                alert(`${subject.parentElement.textContent}을(를) 선택하셨습니다!`);
+        });
+    });
+
+    mailings.forEach((mailing)=>{
+        mailing.addEventListener('change', ()=>{
+            if(mailing.checked) { //mailing 도 마찬가지로 택스트가 부모요소에 있기때문에 부모요소를 가져옴
+                alert(`${mailing.parentElement.textContent}을(를) 선택하셨습니다!`);
+                return;
+            }
+            alert(`${mailing.parentElement.textContent}을(를) 선택해제 했습니다.`);
+        });
+    });
+
+</script>
+
+</body>
+</html>

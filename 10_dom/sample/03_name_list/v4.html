@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+	<div id="container">
+		<h1>참가 신청</h1>
+		<form action="">
+			<input type="text" id="userName" placeholder="이름" required>
+			<button>신청</button>
+		</form>
+		<hr>
+		<div id="nameList"></div>
+	</div>
+	<script>
+		/*
+			v3에서 업데이트
+			- localStorage 기능 추가
+
+		 */
+		const button = document.querySelector('button');
+        const userNameInput = document.getElementById('userName');
+		let list = JSON.parse(localStorage.getItem('userList')) || [];
+
+        // 추가
+        button.addEventListener('click', (e) => {
+			e.preventDefault();
+        	const p = document.createElement('p');
+            p.textContent = userNameInput.value;
+            list.push(p.textContent); // X가 추가 안되도록
+
+            // 삭제버튼 관련 생성 및 이벤트 추가
+            const delButton = document.createElement('span');
+            delButton.textContent = 'X';
+            delButton.setAttribute('class', 'del');
+			p.appendChild(delButton);
+
+      		deleteData(delButton); // 삭제버튼 기능 구현
+            localStorage.setItem('userList', JSON.stringify(list)); // 추가후 업데이트
+            nameList.appendChild(p);
+            userNameInput.value = '';
+        });
+
+        const printList = ()=>{
+            nameList.innerHTML = '';
+            list.forEach((user)=>{
+                const p = document.createElement('p');
+                p.textContent = String(user);
+
+                // 삭제버튼 관련 생성 및 이벤트 추가
+                const delButton = document.createElement('span');
+                delButton.textContent = 'X';
+                delButton.setAttribute('class', 'del');
+                p.appendChild(delButton);
+                deleteData(delButton);
+                nameList.appendChild(p);
+            });
+		}
+
+        //해당하는 버튼을 매개변수로 받아 그 주소로가 삭제
+        const deleteData = (delButton) => {
+            delButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (confirm(`정말 삭제하시겠습니까? 삭제후 복구할 수 없습니다!`)) {
+                    const userName = delButton.parentElement.childNodes[0].nodeValue.trim();  // 사용자 이름만 추출
+                    const idx = list.indexOf(userName);
+                    if (idx !== -1) {
+                        list.splice(idx, 1);
+                        localStorage.setItem('userList', JSON.stringify(list));
+                    }
+                    delButton.parentElement.remove();
+                    alert(`삭제 되었습니다!`);
+                }
+            });
+        }
+
+        printList();
+
+
+
+	</script>
+</body>
+</html>

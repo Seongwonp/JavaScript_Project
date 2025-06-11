@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+	<div id="container">
+		<h1>참가 신청</h1>
+		<form action="">
+			<input type="text" id="userName" placeholder="이름" required>
+			<button>신청</button>
+		</form>
+		<hr>
+		<div id="nameList"></div>
+	</div>
+	<script>
+		/*
+			v2에서 업데이트
+			3. 선택한 노드를 삭제
+			- 노드 생성시 버튼 추가 <span class = "del">X</span>
+			- 생성된 버튼에 이벤트 추가
+
+		 */
+		const button = document.querySelector('button');
+        const userNameInput = document.getElementById('userName');
+
+        button.addEventListener('click', (e) => {
+			e.preventDefault();
+        	const p = document.createElement('p');
+            p.textContent = userNameInput.value;
+
+            // 삭제버튼 관련 생성 및 이벤트 추가
+            const delButton = document.createElement('span');
+            delButton.textContent = 'X';
+            delButton.setAttribute('class', 'del');
+			p.appendChild(delButton);
+
+            delButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                if(confirm(`정말 삭제하시겠습니까? 삭제후 복구할 수 없습니다!`)){
+                    alert(`삭제 되었습니다!`);
+					nameList.removeChild(p);
+                }
+            });
+
+            nameList.prepend(p); // 맨앞에 요소를 넣음
+            userNameInput.value = '';
+
+        });
+
+
+	</script>
+</body>
+</html>

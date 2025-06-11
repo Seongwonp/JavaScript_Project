@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+	<div id="container">
+		<h1>참가 신청</h1>
+		<form action="">
+			<input type="text" id="userName" placeholder="이름" required>
+			<button>신청</button>
+		</form>
+		<hr>
+		<div id="nameList"></div>
+	</div>
+	<script>
+		/*
+			v1에서 추가 시에 맨위로 올라가도록
+		 */
+		const button = document.querySelector('button');
+        const userNameInput = document.getElementById('userName');
+
+
+        button.addEventListener('click', (e) => {
+			e.preventDefault();
+        	const p = document.createElement('p');
+            p.textContent = userNameInput.value;
+            // nameList.appendChild(p);
+			nameList.prepend(p); // 맨앞에 요소를 넣음
+            userNameInput.value = '';
+        });
+	</script>
+</body>
+</html>
