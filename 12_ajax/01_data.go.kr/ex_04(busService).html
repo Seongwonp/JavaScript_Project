@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<script>
+		/*
+			공공데이터 포털에서 '인천국제공항공사_버스정보' 검색
+			https://www.data.go.kr/data/15095045/openapi.do
+			인천국제공항 여객터미널 T1,T2 버스 정보(공항행 첫차/막차,종점행 첫차/막차,성인요금,
+			버스등급,버스번호,지역,운수사,평일시간,주말시간,노선정보,승차위치)를 제공
+
+			-> 대구로 오는 버스노선만 테이블 ㅍ형식으로 출력
+			버스번호, 버스등급, 성인요금, 평일시간표, 주말시간표 순서
+			시간표는 이른 시간이 먼저 나오도록
+		 */
+
+        const getJson = (url, callback) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', url);
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState !== XMLHttpRequest.DONE) {
+                    return;
+                }
+                if (xhr.status === 200) {
+                    callback(JSON.parse(xhr.responseText));
+                } else {
+                    console.error('Error', xhr.status, xhr.statusText);
+                }
+            }
+            xhr.send();
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const getUrl = () => {
+                const serviceKey = 'JJ6azoyBwkg%2B5nStEcjC42v8YVz%2FjxORyrhoQ9zopGfnf5Z%2BifKEI9r8sof18DItEGzVYd%2FzZaGJ%2Fwk4c6LN4w%3D%3D';
+                const location = 6; // - 지역 [1:서울 2:경기 3:인천 4:강원 5:충청 6:경상 7:전라] (default=1)
+                const params = `?serviceKey=${serviceKey}` +
+                    '&numOfRows=100' +
+                    '&pageNo=1' +
+                    `&area=${location}` +
+                    '&type=json'
+
+                const url = "http://apis.data.go.kr/B551177/BusInformation/getBusInfo" + params;
+
+                return url;
+            }
+
+            const getItems = (str1, str2) => {
+                const today = new Date();
+                const timeNow = `${('0' + (today.getHours())).slice(-2)}${('0' + (today.getMinutes())).slice(-2)}`;
+                let times = (str1 + ',' + str2).split(',').map(item=>item.trim()).filter(item => item).sort();
+                let str = '<td>';
+                times.forEach((time) => {
+                    str += (time < timeNow) ? `<span style="color:dimgray">${time}</span> ` : `${time} `;
+                });
+                str += '</td>';
+                return str;
+            };
+
+
+
+            const callback = (obj) =>{
+                const tbody = document.querySelector('tbody');
+                const items = obj.response.body.items;
+                items.forEach((item) => {
+                    const tr = document.createElement('tr');
+                    if(!item.routeinfo.includes('대구')){
+                        return;
+                    }
+                    let td = `
+                    	<td>${item.busnumber}</td>
+                    	<td>${item.cpname}</td>
+                    	<td>${item.busclass}</td>
+                    	<td>${item.adultfare}원</td>`
+						td += getItems(item.t1wdayt, item.t2wdayt);
+                    	td += getItems(item.t1wt, item.t2wt);
+
+						tr.innerHTML = td;
+						tbody.appendChild(tr);
+                });
+            }
+			getJson(getUrl(),callback);
+        });
+	</script>
+	<style>
+		*{margin:0; padding:0; box-sizing:border-box;}
+		caption{
+			font-size: 32px;
+			font-weight: bold;
+		}
+		th{
+			border: 1px solid black;
+			text-align: center;
+			font-weight: bold;
+			font-size: 20px;
+			width: 150px;
+			height: 50px;
+		}
+		td{
+			border: 1px solid black;
+			text-align: center;
+			font-size: 20px;
+			padding: 5px;
+		}
+		body{
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+		table{
+            border-collapse: collapse;
+			border: 1px solid black;
+			margin-top: 20px;
+        }
+	</style>
+</head>
+<body>
+	<table>
+		<caption>버스시간표(대구경유)</caption>
+		<tr>
+			<th>버스번호</th>
+			<th>운수사</th>
+			<th>버스등급</th>
+			<th>성인요금</th>
+			<th>평일시간표</th>
+			<th>주말시간표</th>
+		</tr>
+	</table>
+</body>
+</html>

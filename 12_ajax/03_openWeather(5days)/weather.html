@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>날씨정보</title>
+	<link rel="stylesheet" href="css/style.css">
+	<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const APIkey = "0ec8ff563a2985d98d9de876f03f981d";
+            let getLat, getLon;
+            let cityName = "";
+
+            // 지역 DB
+            const location = {
+                Seoul: {stateCode: "", countryCode: "KR"},
+                Tokyo: {stateCode: "", countryCode: "JP"},
+                "New York": {stateCode: "NY", countryCode: "US"},
+                London: {stateCode: "", countryCode: "GB"},
+                Paris: {stateCode: "", countryCode: "FR"},
+                Sydney: {stateCode: "", countryCode: "AU"},
+                Cairo: {stateCode: "", countryCode: "EG"},
+            }
+
+            const getJson = (url, callback) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', url);
+                xhr.onreadystatechange = () => {
+                    if (xhr.readyState !== XMLHttpRequest.DONE) return;
+                    if (xhr.status === 200) {
+                        callback(JSON.parse(xhr.responseText));
+                    } else {
+                        console.error('Error', xhr.status, xhr.statusText);
+                    }
+                };
+                xhr.send();
+            };
+
+            // 위도 경도 불러오기
+            const getGeoUrl = (cityName, stateCode, countryCode) => {
+                const limit = 1;
+                const params = `q=${cityName},${stateCode},${countryCode}&limit=${limit}&appid=${APIkey}`;
+                return "https://api.openweathermap.org/geo/1.0/direct?" + params;
+            }
+
+            // 5일간 날씨 불러오기
+            const getWeatherUrl = (lat, lon) => {
+                const params = `lat=${lat}&lon=${lon}&appid=${APIkey}&units=metric`;
+                return "https://api.openweathermap.org/data/2.5/forecast?" + params;
+            }
+
+            // 위도 경도 callback
+            const geoCallback = (data) => {
+                const info = data[0];
+                getLat = info.lat;
+                getLon = info.lon;
+                cityName = info.local_names?.ko || info.name; // 한국어 이름 존제유무 확인후 변경
+                console.log(info);
+                getJson(getWeatherUrl(getLat, getLon), callback);
+            }
+
+            // 날씨 callback
+            const callback = (data) => {
+                const div = document.getElementById('weatherInfo');
+                const weather = data.list;
+                // 일별로 그룹화
+                const grouped = {};
+                weather.forEach(item => {
+                    const date = item.dt_txt.slice(0, 10);
+                    if (!grouped[date]) {
+                        grouped[date] = [];
+                    }
+                    grouped[date].push(item);
+                });
+
+                const waterColors = {
+                    Clear: {color: "#fef3c7"},
+                    Clouds: {color: "#dbeafe"},
+                    Rain: {color: "#c7d2fe"},
+                    Snow: {color: "#f0f9ff"},
+                    Default: {color: "#f3f4f6"},
+                }
+                // 맑음, 구름, 비, 눈 을 제외한 모든 날씨상태는 default으로 설정
+                const color = (weather[0].weather[0].main in waterColors)
+                    ? waterColors[weather[0].weather[0].main].color
+                    : waterColors.Default.color;
+                document.body.style.backgroundColor = color;
+
+                // HTML 생성
+                let html = `
+					<h1>${cityName} 날씨</h1>
+					<div class="todayWeather">
+						<ul>
+							<li>도시: ${cityName}</li>
+							<li>위도: ${getLat}</li>
+							<li>경도: ${getLon}</li>
+							<li>현재온도: ${weather[0].main.temp} ℃</li>
+							<li>날씨상태: ${weather[0].weather[0].main}</li>
+						</ul>
+					</div>
+				`;
+
+                html += `
+						<h2>5일간의 날씨 정보</h2>
+						<div class="fiveDayWeather">
+						`;
+
+                for (const month in grouped) {
+                    html += `<h3>${month}</h3>`;
+                    html += `
+						<table class="forecast-table">
+							<thead style="background-color: ${color}">
+								<tr>
+									<th>날짜/시간</th>
+									<th>온도 (℃)</th>
+									<th>날씨</th>
+								</tr>
+							</thead>
+							<tbody>
+					`;
+
+                    grouped[month].forEach(item => {
+						html += `
+								<tr>
+									<td>${item.dt_txt}</td>
+									<td>${item.main.temp}</td>
+									<td>${item.weather[0].main}</td>
+								</tr>
+								`;
+					});
+					html += `
+							</tbody>
+						</table>
+					`;
+                }
+                html += `</div>`;
+                div.innerHTML = html;
+            };
+
+            const div = document.getElementById('buttons');
+            for (let key in location) {
+                const button = document.createElement('button');
+                button.textContent = key;
+                button.value = key;
+                div.appendChild(button);
+            }
+
+
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const data = location[button.value];
+                    getJson(getGeoUrl(button.value, data.stateCode, data.countryCode), geoCallback);
+                });
+            });
+
+        });
+
+	</script>
+</head>
+<body>
+<h1 id="title">날씨 정보 조회</h1>
+<div id="buttons"></div>
+<div id="weatherInfo"></div>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<script>
+        /*
+		  1. 화면에 버튼 9개 생성 (중구, 동구, 서구, 남구, 북구, 수성구, 달서구, 달성군, 군위군)
+		  2. 버튼을 클릭하면 해당 구의 날씨가 화면에 나오도록 코드 작성
+		 */
+        const getJson = (url, callback) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', url);
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState !== XMLHttpRequest.DONE) {
+                    return;
+                }
+                if (xhr.status === 200) {
+                    callback(JSON.parse(xhr.responseText));
+                } else {
+                    console.error('Error', xhr.status, xhr.statusText);
+                }
+            }
+            xhr.send();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            //1. url 확인(파라미터 완성)
+            const getUrl = (data) => {
+                const serviceKey = 'JJ6azoyBwkg%2B5nStEcjC42v8YVz%2FjxORyrhoQ9zopGfnf5Z%2BifKEI9r8sof18DItEGzVYd%2FzZaGJ%2Fwk4c6LN4w%3D%3D';
+                const nx = data.x;
+                const ny = data.y;
+                const today = new Date();
+                const baseDate = `${today.getFullYear()}${('0' + (today.getMonth() + 1)).slice(-2)}${('0' + (today.getDate())).slice(-2)}`; // '20250601' 형태로 만들기  slice(-2)는 오른쪽 끝에서 두자리만 추출
+                const baseTime = (today.getMinutes() < 10) ? `${('0' + (today.getHours() - 1)).slice(-2)}00` : `${('0' + (today.getHours())).slice(-2)}00`; // 현재 분이 10분 미만이면 이전 시간(정시)을 설정.
+
+                let params = `?serviceKey=${serviceKey}&numOfRows=10&pageNo=1`
+                params += `&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}&dataType=JSON`;
+                const url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst' + params;
+                return url;
+            }
+            // 2. request
+            const callback = (obj) => {
+                const items = obj.response.body.items.item;
+                const div = document.getElementById('localWeather');
+                console.log(items);
+                let jsonStr = `[발표 날짜: ${items[0].baseDate}]<br>`;
+                jsonStr += `[발표 시간: ${items[0].baseTime}]<br>`;
+                items.forEach((item) => {
+                    if (item.category === 'PTY') {
+                        let rain;
+                        let code = Number(item.obsrValue);
+                        switch (code) {
+                            case 0:
+                                rain = '없음';
+                                break;
+                            case 1:
+                                rain = '비';
+                                break;
+                            case 2:
+                                rain = '비/눈';
+                                break;
+                            case 3:
+                                rain = '눈';
+                                break;
+                            case 5:
+                                rain = '빗방울'
+                                break;
+                            case 6:
+                                rain = '빗방울눈날림'
+                                break;
+                            case 7:
+                                rain = '눈날림'
+                                break;
+                            default:
+                                break;
+                        }
+                        jsonStr += `* 강수: ${rain} <br>`;
+                    }
+                    if (item.category === 'REH') {
+                        jsonStr += `* 습도 : ${item.obsrValue} %<br>`;
+                    } else if (item.category === 'T1H') {
+                        jsonStr += `* 기온 : ${item.obsrValue} ℃<br>`;
+                    } else if (item.category === 'VEC') {
+                        jsonStr += `* 풍향: ${item.obsrValue} deg<br>`;
+                    } else if (item.category === 'WSD') {
+                        jsonStr += `* 풍속: ${item.obsrValue} m/s<br>`;
+                    }
+
+                });
+                div.innerHTML = jsonStr;
+            }
+
+            const buttons = document.querySelectorAll('.local');
+
+            // // case 1: 배열로 생성하여 for-each 로 탐색
+            // const daegu = [
+            //     {location: '중구', x: 89, y: 90}, {location: '동구', x: 90, y: 91},
+            //     {location: '서구', x: 88, y: 90}, {location: '남구', x: 89, y: 90},
+            //     {location: '북구', x: 89, y: 91}, {location: '수성구', x: 89, y: 90},
+            //     {location: '달서구', x: 88, y: 90}, {location: '달성군', x: 86, y: 88},
+            //     {location: '군위군', x: 88, y: 99}
+            // ];
+            //
+            // buttons.forEach(button => {
+            //     button.addEventListener('click', () => {
+            //         daegu.forEach(data => {
+            //             if (data.location === button.textContent) {
+            //                 location = data;
+            //                 alert(`${location.location}의 날씨 정보입니다.`);
+            //                 getJson(getUrl(location), callback);
+            //             }
+            //         });
+            //     });
+            // });
+
+            // case 2: 객체 생성 (추가)
+            const daegu = {
+                '중구': {x: 89, y: 90}, '동구': {x: 90, y: 91},
+                '서구': {x: 88, y: 90}, '남구': {x: 89, y: 90},
+                '북구': {x: 89, y: 91}, '수성구': {x: 89, y: 90},
+                '달서구': {x: 88, y: 90}, '달성군': {x: 86, y: 88},
+                '군위군': {x: 88, y: 99}
+            };
+            let location;
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const name = button.textContent.trim();
+                    if (daegu[name]) {
+                        location = daegu[name];
+                        alert(`${name}의 날씨 정보입니다.`);
+                        getJson(getUrl(location), callback);
+                    }
+                });
+            });
+        });
+
+
+
+	</script>
+	<style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #localWeather {
+            padding: 10px;
+            font-size: 20px;
+
+        }
+        #buttons {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-evenly;
+            width: 800px;
+            margin-bottom: 10px;
+        }
+        #buttons button {
+            width: 80px;
+            height: 30px;
+            text-align: center;
+            font-size: 16px;
+        }
+        h1 {
+            text-align: center;
+        }
+	</style>
+</head>
+<body>
+<!-- (중구, 동구, 서구, 남구, 북구, 수성구, 달서구, 달성군, 군위군) -->
+<header>
+	<h1>오늘의 날씨 정보 (대구광역시)</h1>
+	<div id="buttons">
+		<button class="local">중구</button>
+		<button class="local">동구</button>
+		<button class="local">서구</button>
+		<button class="local">남구</button>
+		<button class="local">북구</button>
+		<button class="local">수성구</button>
+		<button class="local">달서구</button>
+		<button class="local">달성군</button>
+		<button class="local">군위군</button>
+	</div>
+</header>
+<section>
+	<div id="localWeather"></div>
+</section>
+
+</body>
+</html>

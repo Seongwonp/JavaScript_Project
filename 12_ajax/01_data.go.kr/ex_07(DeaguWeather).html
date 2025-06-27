@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+  <script>
+    /*
+        * OpenWeatherMap API를 이용하여 특정 도시의 5일간의 날씨 예보를 가져오는 프로그램을 작성하세요.
+       	* https://openweathermap.org/api
+
+       	대구의 날씨를 구하시오.
+
+     */
+    const getJson = (url, callback) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', url);
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState !== XMLHttpRequest.DONE) {
+          return;
+        }
+        if (xhr.status === 200) {
+          callback(JSON.parse(xhr.responseText));
+        } else {
+          console.error('Error', xhr.status, xhr.statusText);
+        }
+      }
+      xhr.send();
+    }
+
+
+
+
+
+    const getLat = (city) =>{
+      const apiKey = '0ec8ff563a2985d98d9de876f03f981d';
+      const url = `https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=5&appid=${apiKey}`
+      return url;
+    }
+    const callbackLat = (obj) => {
+      console.log(obj);
+    }
+
+    getJson(getLat('Taegu'),callbackLat);
+
+
+
+    const lat ="";
+    const lon ="";
+    const params = `lat=${lat}&lon=${lon}&appid=${apiKey}`;
+    const url = 'https://api.openweathermap.org/data/2.5/weather' + params;
+  </script>
+</head>
+<body>
+
+</body>
+</html>

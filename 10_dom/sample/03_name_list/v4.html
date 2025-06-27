@@ -29,6 +29,11 @@
         button.addEventListener('click', (e) => {
 			e.preventDefault();
         	const p = document.createElement('p');
+            if(userNameInput.value.trim() === '') {
+             alert(`값을 입력해주세요!!`);
+             userNameInput.value = '';
+             return;
+            }
             p.textContent = userNameInput.value;
             list.push(p.textContent); // X가 추가 안되도록
 
@@ -78,7 +83,6 @@
         }
 
         printList();
-
 
 
 	</script>

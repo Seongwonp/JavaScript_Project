@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const serviceKey = '0ec8ff563a2985d98d9de876f03f981d';
+      let geo = {};
+      const getJson = (url, callback) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState !== XMLHttpRequest.DONE) return;
+          if (xhr.status === 200) {
+            callback(JSON.parse(xhr.responseText));
+          } else {
+            console.error('Error', xhr.status, xhr.statusText);
+          }
+        };
+        xhr.send();
+      };
+
+      const getGeoUrl = (cityName, stateCode, countryCode) => {
+        // stateCode는 존제하는 나라가 있고 없는 나라도 있음!
+        return `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}
+        ,${stateCode ? stateCode + ',' : ''}${countryCode}&limit=1&appid=${serviceKey}`;
+      };
+      const getWeatherUrl = (lat, lon) => {
+        return `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${serviceKey}`;
+      };
+
+      const searchWeather = (cityName, stateCode, countryCode) => {
+        const geoUrl = getGeoUrl(cityName, stateCode, countryCode);
+        const callback = (geoData) => {
+          if (geoData.length === 0) {
+            console.error("위치 정보를 찾을 수 없음");
+            return;
+          }
+
+          const { lat, lon, country } = geoData[0];
+          console.log(`국가코드: ${country}, 위도: ${lat}, 경도: ${lon}`);
+
+          const weatherUrl = getWeatherUrl(lat, lon);
+          const weatherCallback = (data) => {
+            const div = document.getElementById('weather-box');
+            div.innerHTML = `
+              <h1>${data.name} 날씨</h1>
+              <p>온도: ${(data.main.temp - 273.15).toFixed(1)}°C</p>
+              <p>날씨: ${data.weather[0].description}</p>
+
+            `;
+            console.log("날씨 정보:", data);
+          }
+
+          getJson(weatherUrl, weatherCallback);
+        }
+
+        getJson(geoUrl, callback);
+      };
+
+      // 버튼 이벤트 연결
+      const buttons = document.querySelectorAll('.weather-btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const city = btn.dataset.city;
+          const state = btn.dataset.state || '';
+          const country = btn.value;
+          searchWeather(city, state, country);
+        });
+      });
+    });
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f8ff;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    button.weather-btn {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button.weather-btn:hover {
+      background-color: #0056b3;
+    }
+
+    #weather-box {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+<button class="weather-btn" data-city="Seoul" value="KR">서울 날씨</button>
+<button class="weather-btn" data-city="New York" data-state="NY" value="US">뉴욕 날씨</button>
+<button class="weather-btn" data-city="Tokyo" value="JP">도쿄 날씨</button>
+<button class="weather-btn" data-city="London" value="GB">런던 날씨</button>
+<button class="weather-btn" data-city="Paris" value="FR">파리 날씨</button>
+<button class="weather-btn" data-city="Beijing" value="CN">베이징 날씨</button>
+<button class="weather-btn" data-city="Sydney" value="AU">시드니 날씨</button>
+<button class="weather-btn" data-city="Toronto" value="CA">토론토 날씨</button>
+<button class="weather-btn" data-city="Berlin" value="DE">베를린 날씨</button>
+<div id="weather-box">
+
+</div>
+</body>
+</html>

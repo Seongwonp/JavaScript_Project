@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<script>
+        /*
+			https://www.data.go.kr/data/15084084/openapi.do
+			기상청_단기예보 ((구)_동네예보) 조회서비스
+			- 초단기실황조회 사용
+			- 워드 파일의 요청/응답 메시지 예제 응용
+			http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst
+			?serviceKey=인증키&numOfRows=10&pageNo=1
+			&base_date=20210628&base_time=0600&nx=55&ny=127
+
+
+		 */
+        const getJson = (url, callback) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', url);
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState !== XMLHttpRequest.DONE) {
+                    return;
+                }
+                if (xhr.status === 200) {
+                    callback(JSON.parse(xhr.responseText));
+                } else {
+                    console.error('Error', xhr.status, xhr.statusText);
+                }
+            }
+            xhr.send();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            //1. url 확인(파라미터 완성)
+            const getUrl = () => {
+                const serviceKey = 'JJ6azoyBwkg%2B5nStEcjC42v8YVz%2FjxORyrhoQ9zopGfnf5Z%2BifKEI9r8sof18DItEGzVYd%2FzZaGJ%2Fwk4c6LN4w%3D%3D';
+                const nx = 89;
+                const ny = 90;
+                const today = new Date();
+                const baseDate = `${today.getFullYear()}${('0' + (today.getMonth() + 1)).slice(-2)}${('0' + (today.getDate())).slice(-2)}`; // '20250601' 형태로 만들기  slice(-2)는 오른쪽 끝에서 두자리만 추출
+                const baseTime = (today.getMinutes() < 10) ? `${('0' + (today.getHours() - 1)).slice(-2)}00` : `${('0' + (today.getHours())).slice(-2)}00`; // 현재 분이 10분 미만이면 이전 시간(정시)을 설정.
+
+                let params = `?serviceKey=${serviceKey}&numOfRows=10&pageNo=1`
+                params += `&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}&dataType=JSON`;
+                const url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst' + params;
+                console.log(url);
+
+                return url;
+            }
+
+            // 2. request
+            const callback = (obj) => {
+                const items = obj.response.body.items.item;
+                const div = document.querySelector('div');
+                console.log(items);
+                let jsonStr = `[발표 날짜: ${items[0].baseDate}]<br>`;
+                jsonStr += `[발표 시간: ${items[0].baseTime}]<br>`;
+                items.forEach((item) => {
+                    if (item.category === 'PTY') {
+                        let rain = '';
+                        switch (item.obsrValue) {
+                            case 0:
+                                rain = '없음';
+                                break;
+                            case 1:
+                                rain = '비';
+                                break;
+                            case 2:
+                                rain = '비/눈';
+                                break;
+                            case 3:
+                                rain = '눈';
+                                break;
+                            case 5:
+                                rain = '빗방울'
+                                break;
+                            case 6:
+                                rain = '빗방울눈날림'
+                                break;
+                            case 7:
+                                rain = '눈날림'
+                                break;
+                            default:
+                                break;
+                        }
+                        jsonStr += `* 강수: ${rain} <br>`;
+                    }
+                    if (item.category === 'REH') {
+                        jsonStr += `* 습도 : ${item.obsrValue} %<br>`;
+                    } else if (item.category === 'T1H') {
+                        jsonStr += `* 기온 : ${item.obsrValue} ℃<br>`;
+                    } else if (item.category === 'VEC') {
+                        jsonStr += `* 풍향: ${item.obsrValue} deg<br>`;
+                    } else if (item.category === 'WSD') {
+                        jsonStr += `* 풍속: ${item.obsrValue} m/s<br>`;
+                    }
+
+                });
+                div.innerHTML = jsonStr;
+            }
+
+            getJson(getUrl(), callback);
+
+        });
+
+
+	</script>
+</head>
+<body>
+<!-- 공공 api 작업 -->
+<div>
+
+</div>
+</body>
+</html>

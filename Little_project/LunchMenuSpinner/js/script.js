@@ -50,7 +50,6 @@ const newMake = () => {
         const angle = arc * i + arc / 2 - Math.PI / 2;
 
         ctx.save();
-
         ctx.translate(
             cw + Math.cos(angle) * (cw - 50),
             ch + Math.sin(angle) * (ch - 50)
