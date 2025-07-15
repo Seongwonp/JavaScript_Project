@@ -33,7 +33,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       const getUrl = (airport_code) => {
-        const serviceKey = 'JJ6azoyBwkg%2B5nStEcjC42v8YVz%2FjxORyrhoQ9zopGfnf5Z%2BifKEI9r8sof18DItEGzVYd%2FzZaGJ%2Fwk4c6LN4w%3D%3D';
+        const serviceKey = 'myKey';
         const params = `?serviceKey=${serviceKey}&airport_code=${airport_code}&type=json`
         const url = "http://apis.data.go.kr/B551177/StatusOfPassengerFlightsDSOdp/getPassengerDeparturesDSOdp" + params;
         return url;
